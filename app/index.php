@@ -67,7 +67,7 @@ $app->group('/Mesas', function (RouteCollectorProxy $group) {
 //Pedidos
 $app->group('/Pedidos', function (RouteCollectorProxy $group) {
     $group->get('[/]', \pedidosController::class . ':TraerTodos');
-    $group->post('[/]', \pedidosController::class . ':CargarUno');
+    $group->post('[/]', \pedidosController::class . ':CargarUno')->add(new AuthMozoMW());
 })->add(new AuthRolesMW())
 ->add(new AuthUsuariosMW());
 
