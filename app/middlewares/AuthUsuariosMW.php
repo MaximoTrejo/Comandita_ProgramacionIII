@@ -7,13 +7,14 @@ use Slim\Psr7\Response as Response;
 class AuthUsuariosMW{
 
     public function  __invoke(Request $request,RequestHandler $handler){
-        //traigo los parametros 
-        $params = $request ->getQueryParams();
-        $usuario = $params["usuario1"];
-        $clave = $params["clave"];
         
         //valido que haya algo en los parametros 
-        if(isset($usuario) && isset($clave)){
+        if(isset($params["usuario1"]) && isset($params["clave"])){
+            //los traigo
+            $params = $request ->getQueryParams();
+            //los guardo
+            $usuario = $params["usuario1"];
+            $clave = $params["clave"];
             //traiga el usuario 
             $usuarioEncontrado = Usuario::TraerPorNombreClave($usuario,$clave);
             //valido que la consulta no venga vacia 
