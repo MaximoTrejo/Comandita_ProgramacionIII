@@ -4,7 +4,6 @@ class Pedidos
 {
     public $id;
     public $idUsuario;
-    public $idArticulo;
     public $idMesa;
     public $total;
     public $estado;
@@ -15,10 +14,9 @@ class Pedidos
     public function crearPedido()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedidos (idUsuario , idArticulo, idMesa,total,estado,foto,puntuacion,descripcionPuntuacion) VALUES (:idUsuario,:idArticulo,:idMesa,:total,:estado,:foto,:puntuacion,:descripcionPuntuacion)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedidos (idUsuario , idMesa,total,estado,foto,puntuacion,descripcionPuntuacion) VALUES (:idUsuario,:idMesa,:total,:estado,:foto,:puntuacion,:descripcionPuntuacion)");
         $consulta->bindValue(':idUsuario', $this->idUsuario, PDO::PARAM_STR);
-        $consulta->bindValue(':idArticulo', $this->idArticulo, PDO::PARAM_STR);
-        $consulta->bindValue(':idMesa', $this->idArticulo, PDO::PARAM_STR);
+        $consulta->bindValue(':idMesa', $this->idMesa, PDO::PARAM_STR);
         $consulta->bindValue(':total', $this->total, PDO::PARAM_STR);
         $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
         $consulta->bindValue(':foto', $this->foto, PDO::PARAM_STR);
@@ -31,12 +29,11 @@ class Pedidos
     public static function obtenerTodos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id,idUsuario, idArticulo,idMesa,total,estado,foto,puntuacion,descripcionPuntuacion FROM pedidos");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id,idUsuario,idMesa,total,estado,foto,puntuacion,descripcionPuntuacion FROM pedidos");
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS,'pedidos');
     }
-    
 
 
 }

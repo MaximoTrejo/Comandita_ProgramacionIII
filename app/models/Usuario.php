@@ -30,5 +30,15 @@ class Usuario
     }
     
 
+    public static function TraerPorNombreClave($usuario , $clave)
+	{
+		$objAccesoDatos = AccesoDatos::ObtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT *  FROM usuarios where usuario = :usuario and clave = :clave");
+        $consulta->bindParam(':usuario', $usuario, PDO::PARAM_STR);
+        $consulta->bindParam(':clave', $clave, PDO::PARAM_STR);
+        $consulta->execute();
+		return $consulta->fetchAll(PDO::FETCH_CLASS, 'Usuario');
+	}
+
 
 }
