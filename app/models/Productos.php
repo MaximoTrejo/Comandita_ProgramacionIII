@@ -1,5 +1,7 @@
 <?php
 
+require_once './utils/Archivos.php';
+
 class Productos
 {
     public $id;
@@ -28,6 +30,55 @@ class Productos
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'productos');
     }
     
+    public static function CsvToProductos($rutaArchivo)
+    {
+        $refArchivo = fopen($rutaArchivo, "r");
+        $arrayAtr = array();
+        $datos = array();
+
+        if ($refArchivo) {
+
+            while (!feof($refArchivo)) {
+
+                $arrayAtr = fgetcsv($refArchivo);
+
+                if (!empty($arrayAtr)) {
+
+                    $model = new Productos();
+                    $model->id = $arrayAtr[0];
+                    $model->nombre = $arrayAtr[1];
+                    $model->precio = $arrayAtr[2];
+                    $model ->rol = $arrayAtr[3];
+                    array_push($datos, $model);
+                }
+            }
+            fclose($refArchivo);
+        }
+
+        return $datos;
+    }
+
+    public static function SubirDatosCsv()
+    {
+        $ruta = BASE_PATH . '/ArchivosSubidos/';
+
+        $archivo = Archivos::GuardarArchivoPeticion($ruta, "ProductosSubidos", 'archivo', '.csv');
+        
+        if ($archivo != "N/A") {
+            
+            $array = self::CsvToProductos($archivo);
+
+            if(!empty($array)){
+
+                foreach ($array as $usuario) {
+                    $usuario->crearProductos();
+                }
+                return true;
+            }
+        }
+        
+        return false;
+    }
 
 
 }

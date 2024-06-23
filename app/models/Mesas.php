@@ -23,5 +23,51 @@ class Mesas
     }
     
 
+    public static function CsvToMesa($rutaArchivo)
+    {
+        $refArchivo = fopen($rutaArchivo, "r");
+        $arrayAtr = array();
+        $datos = array();
 
+        if ($refArchivo) {
+
+            while (!feof($refArchivo)) {
+
+                $arrayAtr = fgetcsv($refArchivo);
+
+                if (!empty($arrayAtr)) {
+
+                    $model = new Mesas();
+                    $model->id = $arrayAtr[0];
+                    $model->estado = $arrayAtr[1];
+                    array_push($datos, $model);
+                }
+            }
+            fclose($refArchivo);
+        }
+
+        return $datos;
+    }
+
+    public static function SubirDatosCsv()
+    {
+        $ruta = BASE_PATH . '/ArchivosSubidos/';
+
+        $archivo = Archivos::GuardarArchivoPeticion($ruta, "MesaSubidas", 'archivo', '.csv');
+        
+        if ($archivo != "N/A") {
+            
+            $array = self::CsvToMesa($archivo);
+
+            if(!empty($array)){
+
+                foreach ($array as $usuario) {
+                    $usuario->crearProductos();
+                }
+                return true;
+            }
+        }
+        
+        return false;
+    }
 }

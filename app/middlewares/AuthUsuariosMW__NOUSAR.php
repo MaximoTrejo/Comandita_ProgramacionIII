@@ -10,15 +10,14 @@ class AuthUsuariosMW{
         //los traigo
         $params = $request ->getQueryParams();
         //valido que haya algo en los parametros 
-        if(isset($params["usuario1"]) && isset($params["clave"])){
+        if(isset($params["usuario"]) && isset($params["clave"])){
             //los guardo
-            $usuario = $params["usuario1"];
+            $usuario = $params["usuario"];
             $clave = $params["clave"];
             //traiga el usuario 
             $usuarioEncontrado = Usuario::TraerPorNombreClave($usuario,$clave);
             //valido que la consulta no venga vacia 
             if($usuarioEncontrado != null){
-
                 //al devolver un array en ver de un objeto del tipo Usuario lo que hago es agarrar el primer dato 
                 //y sacar el usuario y la clave y compararlo con los que traigo por  parametros  
                 if ($usuarioEncontrado[0]->usuario == $usuario && $usuarioEncontrado[0]->clave == $clave) {

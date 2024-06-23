@@ -29,8 +29,6 @@ class pedidosController extends Pedidos implements IApiUsable
         //llamado a funcion 
         $usr->crearPedido();
 
-        //PREGUNTAR AL PROFE 
-
         //traigo el objeto acceso de datos
         $ObjetoAccD = AccesoDatos::obtenerInstancia() ;
         //obtengo el ultimo id utilizando la funcion que esta dentro de mi onjeto AccesoDatos
@@ -50,7 +48,6 @@ class pedidosController extends Pedidos implements IApiUsable
                 $ped->crearProductos();
             }
         }
-        //PREGUNTAR AL PROFE 
 
         //revisar
         $payload = json_encode(array("mensaje" => "Pedido creado con exito"));
@@ -64,8 +61,90 @@ class pedidosController extends Pedidos implements IApiUsable
         $payload = json_encode(array("listaPedido" => $lista));
 
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+        return $response ->withHeader('Content-Type', 'application/json');
     }
 
+    public function TraerPedidosPendientesID($request, $response, $args)
+    {
+        //traer datos desde el compose
+        $params = $request->getParsedBody();
+        $articulo = $params["ID_articulo"];
+        $pedido = $params["ID_pedido"];
+        $lista = Ped_Productos::obtePedPenID($pedido,$articulo);
+        $payload = json_encode(array("listaPedidoPendientes" => $lista));
+
+        $response->getBody()->write($payload);
+        return $response ->withHeader('Content-Type', 'application/json');
+    }
+
+
+//bartender 
+    public function TraerPedidosPendientesBartender($request, $response, $args)
+    {
+        $lista = Ped_Productos::obtenerPedidosPendientesBartender();
+        $payload = json_encode(array("listaPedidoPendientes" => $lista));
+
+        $response->getBody()->write($payload);
+        return $response ->withHeader('Content-Type', 'application/json');
+    }
+
+
+    
+//cocineros
+    public function TraerPedidosPendientesCocineros($request, $response, $args)
+    {
+        $lista = Ped_Productos::obtenerPedidosPendientesCocineros();
+        $payload = json_encode(array("listaPedidoPendientes" => $lista));
+
+        $response->getBody()->write($payload);
+        return $response ->withHeader('Content-Type', 'application/json');
+    }
+
+//cerveceros
+public function TraerPedidosPendientesCerveceros($request, $response, $args)
+{
+    $lista = Ped_Productos::obtenerPedidosPendientesCerveceros();
+    $payload = json_encode(array("listaPedidoPendientes" => $lista));
+
+    $response->getBody()->write($payload);
+    return $response ->withHeader('Content-Type', 'application/json');
+}
+
+
+    public  function FinalizarEstadoProducto($request, $response, $args)
+    {
+        //traer datos desde el compose
+        $parametros = $request->getParsedBody();
+        
+        $pedido = new Ped_Productos();
+        $pedido->id_pedido =  $parametros['ID_pedido'];
+        $pedido->id_articulos =  $parametros['ID_articulo'];
+        $pedido ->ModificarEstado();
+        //revisar
+        $payload = json_encode(array("mensaje" => "El estado se modifico con exito"));
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    public  function FinalizarPedido($request, $response, $args)
+    {
+        $parametros = $request->getParsedBody();   
+        $pedidoF = new Ped_Productos();
+        $pedidoF-> id_pedido=  $parametros['ID_F_pedido'];
+        $consulta =  $pedidoF ->verificarPedido($pedidoF-> id_pedido);
+
+        if(empty($consulta)){
+            $pedido = new Pedidos();
+            $pedido ->id  = $pedidoF-> id_pedido=  $parametros['ID_F_pedido'];
+            $pedido ->ModificarEstado();
+            $payload = json_encode(array("mensaje" => "El estado se modifico con exito"));
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
+        }else{
+            $payload = json_encode(array("mensaje" => "Hay un articulo pendiente"));
+        }
+
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+    }
 }

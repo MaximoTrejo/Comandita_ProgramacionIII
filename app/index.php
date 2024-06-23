@@ -15,9 +15,9 @@ require __DIR__ . '/../vendor/autoload.php';
 require_once './db/AccesoDatos.php';
 
 //Middleware
-require_once './middlewares/AuthSocioMW.php';
 require_once './middlewares/AuthRolesMW.php';
-require_once './middlewares/AuthUsuariosMW.php';
+require_once './middlewares/AuthPedidosArticulosMW.php';
+require_once './middlewares/AuthPedidoMW.php';
 
 //Controllers 
 require_once './controllers/usuarioController.php';
@@ -40,38 +40,68 @@ $app->addErrorMiddleware(true, true, true);
 // Add parse body
 $app->addBodyParsingMiddleware();
 
-// Routes
+
+
+$app->post('/login', \UsuarioController::class .':Login');
+
+define ('BASE_PATH',__DIR__);
 
 //Usuarios
 $app->group('/usuarios', function (RouteCollectorProxy $group) {
     $group->get('[/]', \UsuarioController::class . ':TraerTodos');
-    $group->post('[/]', \UsuarioController::class . ':CargarUno');
+    $group->post('/CargaCsv', \UsuarioController::class . ':CargaCsv');
+    $group->post('/ExportarCsv', \UsuarioController::class . ':ExportarCsv');
+    $group->post('[/]', \UsuarioController::class . ':CargarUno') ->add (new chekRolesMW);
 })->add(new AuthSocioMW())
-->add(new AuthRolesMW())
-->add(new AuthUsuariosMW());
+->add(new AuthRolesMW());
 
 //Productos
 $app->group('/Productos', function (RouteCollectorProxy $group) {
     $group->get('[/]', \productosController::class . ':TraerTodos');
+    $group->post('/CargaCsv', \productosController::class . ':CargaCsv');
+    $group->post('/ExportarCsv', \productosController::class . ':ExportarCsv');
     $group->post('[/]', \productosController::class . ':CargarUno') ->add(new AuthSocioMW());
-})->add(new AuthRolesMW())
-->add(new AuthUsuariosMW());
+})->add(new AuthRolesMW());
 
 //Mesas
 $app->group('/Mesas', function (RouteCollectorProxy $group) {
     $group->get('[/]', \mesasController::class . ':TraerTodos');
+    $group->post('/CargaCsv', \mesasController::class . ':CargaCsv');
+    $group->post('/ExportarCsv', \mesasController::class . ':ExportarCsv');
     $group->post('[/]', \mesasController::class . ':CargarUno')->add(new AuthSocioMW());
-})->add(new AuthRolesMW())
-->add(new AuthUsuariosMW());
+})->add(new AuthRolesMW());
 
-//Pedidos
+
+//------------------------------------------------------------------------------------------------------------------
+//Pedidos mozos
 $app->group('/Pedidos', function (RouteCollectorProxy $group) {
     $group->get('[/]', \pedidosController::class . ':TraerTodos');
     $group->post('[/]', \pedidosController::class . ':CargarUno')->add(new AuthMozoMW());
-})->add(new AuthRolesMW())
-->add(new AuthUsuariosMW());
+    $group->get('/TraerPedidosPendientes', \pedidosController::class . ':TraerPedidosPendientesID')->add(new AuthMozoMW());
+    $group->post('/Entregar', \pedidosController::class . ':FinalizarPedido');
+})->add(new AuthRolesMW());
+
+//bartender
+$app->group('/PedidosPendientesBarterder', function (RouteCollectorProxy $group) {
+    $group->get('[/]', \pedidosController::class . ':TraerPedidosPendientesBartender');
+    $group->post('[/]', \pedidosController::class . ':FinalizarEstadoProducto')->add(new AuthArticulosMW());
+})->add(new AuthRolesMW());
+
+//cocineros
+$app->group('/PedidosPendientesCocinero', function (RouteCollectorProxy $group) {
+    $group->get('[/]', \pedidosController::class . ':TraerPedidosPendientesCocineros');
+    $group->post('[/]', \pedidosController::class . ':FinalizarEstadoProducto')->add(new AuthArticulosMW());
+})->add(new AuthRolesMW());
+
+//cerveceros
+$app->group('/PedidosPendientesCerveceros', function (RouteCollectorProxy $group) {
+    $group->get('[/]', \pedidosController::class . ':TraerPedidosPendientesCerveceros');
+    $group->post('[/]', \pedidosController::class . ':FinalizarEstadoProducto')->add(new AuthArticulosMW());
+})->add(new AuthRolesMW());
 
 
+//-----------------------------------------------------------------------------------------------------------------------------
+//mensaje random
 $app->get('[/]', function (Request $request, Response $response) {    
     $payload = json_encode(array("mensaje" => "MaximoTrejo - La comandita"));
     

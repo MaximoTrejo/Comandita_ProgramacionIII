@@ -36,4 +36,27 @@ class Pedidos
     }
 
 
+    public function ModificarEstado()
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("UPDATE pedidos set estado = :estado where id = :id");
+        $consulta->bindValue(':id', $this->id, PDO::PARAM_STR);
+        $consulta->bindValue(':estado', 'FINALIZADO', PDO::PARAM_STR);
+        $consulta->execute();
+        return $objAccesoDatos;
+    }
+    public static function obtenerPedido_ID($pedido)
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM pedidos where id = :id");
+        $consulta->bindValue(':id', $pedido, PDO::PARAM_STR);
+        $consulta->execute();
+
+        return $consulta->fetchAll(PDO::FETCH_CLASS,'pedidos');
+    }
+
+
+
+
+
 }
