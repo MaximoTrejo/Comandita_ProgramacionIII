@@ -13,6 +13,8 @@ class UsuarioController extends usuario implements IApiUsable
     {
         //traer datos desde el compose
         $parametros = $request->getParsedBody();
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);  
         $usuario = $parametros['usuario'];
         $clave = $parametros['clave'];
         $rol = $parametros['rol'];
@@ -24,6 +26,7 @@ class UsuarioController extends usuario implements IApiUsable
         //llamado a funcion 
         $usr->crearUsuario();
         //revisar
+        self::AlmacenarLog($token,"CargarUno");
         $payload = json_encode(array("mensaje" => "Usuario creado con exito"));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
@@ -32,7 +35,13 @@ class UsuarioController extends usuario implements IApiUsable
     public function TraerTodos($request, $response, $args)
     {
         $lista = Usuario::obtenerTodos();
+
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);  
+ 
         $payload = json_encode(array("listaUsuario" => $lista));
+
+        self::AlmacenarLog($token,"TraerTodos");
 
         $response->getBody()->write($payload);
         return $response
@@ -42,8 +51,11 @@ class UsuarioController extends usuario implements IApiUsable
     public function ExportarCsv($request, $response, $args)
     {
         $lista = Usuario::obtenerTodos();
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);
         // Definir la ruta y el nombre del archivo CSV
-        $filePath = BASE_PATH . '/Archivos/';// Asegúrate de que esta ruta sea válida y tenga permisos de escritura
+        $filePath = BASE_PATH .'/Archivos/Usuarios.csv';// Asegúrate de que esta ruta sea válida y tenga permisos de escritura
+
         $file = fopen($filePath, 'w');
         // Escribir la cabecera del archivo CSV
         fputcsv($file, array('id', 'usuario', 'clave', 'rol'));
@@ -55,7 +67,7 @@ class UsuarioController extends usuario implements IApiUsable
 
         // Cerrar el archivo
         fclose($file);
-
+        self::AlmacenarLog($token,"ExportarCSV");
         $payload = json_encode(array("mensaje" => "Se exporto el csv"));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
@@ -64,7 +76,6 @@ class UsuarioController extends usuario implements IApiUsable
     public function Login($request, $response, $args)
     {
         $params = $request->getParsedBody();
-
         if (isset($params['id']) && isset($params['usuario']) && isset($params['clave'])) {
 
 
@@ -83,13 +94,14 @@ class UsuarioController extends usuario implements IApiUsable
                             'id' => $usuario[0]->id,
                             'rol' => $usuario[0]->rol,
                             'fecha' => date('Y-m-d'),
-                            'hora' => date('H:i:s')
+                            'hora' => date('H:i:s'),
+                            'estado'=>$usuario[0]->estado
                         )
                     );
 
                     if (!empty($jwt)) {
-                        //setcookie("token", $jwt, time() + 1800, '/', "localhost", false, true);
                         $payload = json_encode(array("jwt" => $jwt));
+                        self::AlmacenarLog($jwt,"Login");
                     } else {
                         $payload = json_encode(array("mensaje" => "No se pudo crear el token "));
                     }
@@ -111,8 +123,11 @@ class UsuarioController extends usuario implements IApiUsable
 
     public function CargaCsv($request, $response, $args)
     {
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);
 
         if (Usuario::SubirDatosCsv()){
+            self::AlmacenarLog($token,"CargarCSV");
             $payload = json_encode(array("msg" => "Los datos del archivo se subieron correctamente!"));
         }else{
             $payload = json_encode(array("msg" => "Hubo un problema al subir los datos del archivo."));
@@ -120,4 +135,45 @@ class UsuarioController extends usuario implements IApiUsable
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
+
+    public static function AlmacenarLog($jwt,$accion)
+	{
+		try {
+			AutentificadorJWT::VerificarToken($jwt);
+			$data = AutentificadorJWT::ObtenerData($jwt);
+			$objAccesoDatos = AccesoDatos::ObtenerInstancia();
+			$req = $objAccesoDatos->PrepararConsulta("INSERT INTO logs (idUser, fecha, hora ,accion) VALUES (:idUser, :fecha, :hora,:accion)");
+			$req->bindValue(':idUser', $data->id, PDO::PARAM_INT);
+			$req->bindValue(':fecha', $data->fecha, PDO::PARAM_STR);
+			$req->bindValue(':hora', $data->hora, PDO::PARAM_STR);
+            $req->bindValue(':accion', $accion, PDO::PARAM_STR);
+			$req->execute();
+		} catch (Exception $ex) {
+			throw new Exception("Error al almacenar el log.");
+		}
+	}
+
+    public  function EstadoEmpleado($request, $response, $args)
+    {
+        //traer datos desde el compose
+        $parametros = $request->getParsedBody();
+        $usuario = $parametros['usuario'];
+        $clave = $parametros['clave'];
+        $estado = $parametros['estado'];
+        $usu = new Usuario;
+        $usuarioEncontrado = $usu ->TraerPorNombreClave($usuario,$clave);
+
+        if(!empty($usuarioEncontrado)){ 
+
+            $usu ->modificarEstado($estado,$usuarioEncontrado[0]->id);
+            $payload = json_encode(array("mensaje" => "El estado se modifico con exito"));
+
+        }else{
+            $payload = json_encode(array("mensaje" => "El usuario no existe"));
+        }
+
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
 }

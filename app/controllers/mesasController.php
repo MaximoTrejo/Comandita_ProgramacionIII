@@ -42,7 +42,7 @@ class mesasController extends Mesas implements IApiUsable
         $lista = Mesas::obtenerTodos();
         // Definir la ruta y el nombre del archivo CSV
 
-        $filePath = BASE_PATH . '/Archivos/';
+        $filePath = BASE_PATH . '/Archivos/Mesa.csv';
         $file = fopen($filePath, 'w');
         // Escribir la cabecera del archivo CSV
         fputcsv($file, array('id', 'estado'));

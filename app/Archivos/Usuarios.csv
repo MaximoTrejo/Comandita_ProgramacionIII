@@ -1,7 +1,9 @@
 id,usuario,clave,rol
-1,franco,2,socio
-2,pedro,dasdqsdw2sd23,socio
-3,jorge,sda2s2f332f2,socio
-4,maxi,1,mozo
-5,maxi2,$2y$10$W2KfgzXDjqa7ccQ1t.Rp6.uDfjEZLpaehgSMp3F7aYpnRXQIkQWy2,socio
-6,maxi7,$2y$10$1.ig0SF8obYx/aJMW9KICeeddiCuwRmdZT/08GjEkZuR7IyAFCIKm,socio2
+7,maxi,123,socio
+28,usuario,$2y$10$QEMvHUM5ZxZLZrvkfexoi.ZHIpxe2KisLxFt0KTMUEYg2mSLxNIJG,rol
+29,franco,$2y$10$kanO6jea7Kh5kYFdd0DrBOzUVmiDqLOBJtaraeMcFZGLa0m/HKfcu,socio
+30,pedro,$2y$10$53cuBsCwDTkxwLytwB9qJegyl2A.pxN4FzZcOpFVRgOqPDEDDIX7S,socio
+31,jorge,$2y$10$0Po34gzJMX7A0c3GVOmTWOHguF5LHcu2w9moB4xLL4J7OwiY2oFCK,socio
+32,maxi,$2y$10$hI5XqIpgGSoCJrD4WSS0R.te0N77XE7CNVkKUeIKYjZ8cXFX4i6RC,mozo
+33,maxi2,$2y$10$q302d01y5GQYJl6ac52fTe6FKBc1JteqjhkhFVG6LMf4kWdzllviG,socio
+34,maxi7,$2y$10$qbMQI29evASNyaPEy7wr1OhonQQtzStiFv22Wlp3zxsKwD/ghNN/S,socio2

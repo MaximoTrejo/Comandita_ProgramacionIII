@@ -51,10 +51,11 @@ $app->group('/usuarios', function (RouteCollectorProxy $group) {
     $group->get('[/]', \UsuarioController::class . ':TraerTodos');
     $group->post('/CargaCsv', \UsuarioController::class . ':CargaCsv');
     $group->post('/ExportarCsv', \UsuarioController::class . ':ExportarCsv');
+    $group->put('/ModificarEstado', \UsuarioController::class . ':EstadoEmpleado');
     $group->post('[/]', \UsuarioController::class . ':CargarUno') ->add (new chekRolesMW);
 })->add(new AuthSocioMW())
-->add(new AuthRolesMW());
-
+->add(new AuthRolesMW())
+->add(new AuthEstadoMW());
 //Productos
 $app->group('/Productos', function (RouteCollectorProxy $group) {
     $group->get('[/]', \productosController::class . ':TraerTodos');
@@ -69,8 +70,8 @@ $app->group('/Mesas', function (RouteCollectorProxy $group) {
     $group->post('/CargaCsv', \mesasController::class . ':CargaCsv');
     $group->post('/ExportarCsv', \mesasController::class . ':ExportarCsv');
     $group->post('[/]', \mesasController::class . ':CargarUno')->add(new AuthSocioMW());
-})->add(new AuthRolesMW());
-
+})->add(new AuthRolesMW())
+->add(new AuthEstadoMW());
 
 //------------------------------------------------------------------------------------------------------------------
 //Pedidos mozos
@@ -79,26 +80,26 @@ $app->group('/Pedidos', function (RouteCollectorProxy $group) {
     $group->post('[/]', \pedidosController::class . ':CargarUno')->add(new AuthMozoMW());
     $group->get('/TraerPedidosPendientes', \pedidosController::class . ':TraerPedidosPendientesID')->add(new AuthMozoMW());
     $group->post('/Entregar', \pedidosController::class . ':FinalizarPedido');
-})->add(new AuthRolesMW());
-
+})->add(new AuthRolesMW())
+->add(new AuthEstadoMW());
 //bartender
 $app->group('/PedidosPendientesBarterder', function (RouteCollectorProxy $group) {
     $group->get('[/]', \pedidosController::class . ':TraerPedidosPendientesBartender');
     $group->post('[/]', \pedidosController::class . ':FinalizarEstadoProducto')->add(new AuthArticulosMW());
-})->add(new AuthRolesMW());
-
+})->add(new AuthRolesMW())
+->add(new AuthEstadoMW());
 //cocineros
 $app->group('/PedidosPendientesCocinero', function (RouteCollectorProxy $group) {
     $group->get('[/]', \pedidosController::class . ':TraerPedidosPendientesCocineros');
     $group->post('[/]', \pedidosController::class . ':FinalizarEstadoProducto')->add(new AuthArticulosMW());
-})->add(new AuthRolesMW());
-
+})->add(new AuthRolesMW())
+->add(new AuthEstadoMW());
 //cerveceros
 $app->group('/PedidosPendientesCerveceros', function (RouteCollectorProxy $group) {
     $group->get('[/]', \pedidosController::class . ':TraerPedidosPendientesCerveceros');
     $group->post('[/]', \pedidosController::class . ':FinalizarEstadoProducto')->add(new AuthArticulosMW());
-})->add(new AuthRolesMW());
-
+})->add(new AuthRolesMW())
+->add(new AuthEstadoMW());
 
 //-----------------------------------------------------------------------------------------------------------------------------
 //mensaje random

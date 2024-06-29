@@ -41,7 +41,7 @@ class productosController extends Productos implements IApiUsable
     {
         $lista = Productos::obtenerTodos();
         // Definir la ruta y el nombre del archivo CSV
-        $filePath = BASE_PATH . '/Archivos/';
+        $filePath = BASE_PATH . '/Archivos/Productos.csv';
         $file = fopen($filePath, 'w');
         // Escribir la cabecera del archivo CSV
         fputcsv($file, array('id', 'nombre','precio','rol'));

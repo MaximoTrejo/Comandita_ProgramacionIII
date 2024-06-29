@@ -9,7 +9,7 @@ class  AuthRolesMW{
 
     public function  __invoke(Request $request,RequestHandler $handler){
 
-        $params = $request ->getQueryParams();
+        $params = $request ->getParsedBody();
         $roles = ['bartender', 'cervecero', 'cocinero', 'mozo', 'socio'];
 
         $response = new Response();
@@ -36,15 +36,14 @@ class  AuthRolesMW{
         
     }
 
-
-
 }
+
 
 class  chekRolesMW{
 
     public function  __invoke(Request $request,RequestHandler $handler){
 
-        $params = $request ->getQueryParams();
+        $params = $request ->getParsedBody();
         $roles = ['bartender', 'cervecero', 'cocinero', 'mozo', 'socio', 'cliente'];
 
         if(isset($params["rol"])){
@@ -59,7 +58,7 @@ class  chekRolesMW{
 
         }else{
             $response = new Response();
-            $response->getBody()->write(json_encode(array("error"=> "No hay credeciales")));
+            $response->getBody()->write(json_encode(array("error"=> "Rol incorrecto")));
         }
         return  $response;
 
@@ -117,6 +116,41 @@ class AuthMozoMW{
                     $response = $handler->handle($request);
                 }else{
                     $response->getBody()->write(json_encode(array("msg" => "Solo los socios pueden realizar esta accion!")));
+                }
+
+            }catch (Exception $ex) {
+				$response->getBody()->write($ex->getMessage());
+			}
+        
+        } else {
+            //si no estan completos los parametros le digo al usuario que faltan cargar las credenciales
+            $response = new Response();
+            $response->getBody()->write(json_encode(array("msg" => "No hay un token registrado. Inicie sesion.")));
+        }
+        return  $response;
+    }
+
+}
+
+
+class  AuthEstadoMW{
+
+    public function  __invoke(Request $request, RequestHandler $handler)
+    {
+        $response = new Response();
+        $header = $request->getHeaderLine('Authorization');
+        if (!empty($header)) {
+
+            $token = trim(explode("Bearer", $header)[1]);
+            try {
+                AutentificadorJWT::VerificarToken($token);
+
+                $dataJWT = AutentificadorJWT::ObtenerData($token);
+
+                if(!strcasecmp($dataJWT->estado, "activo")){
+                    $response = $handler->handle($request);
+                }else{
+                    $response->getBody()->write(json_encode(array("msg" => "Solo los usuarios activos pueden realizar esta accion!")));
                 }
 
             }catch (Exception $ex) {
