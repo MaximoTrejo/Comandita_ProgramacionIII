@@ -15,7 +15,7 @@ class Productos
         $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO productos (nombre,precio,rol) VALUES (:nombre , :precio,:rol)");
         $consulta->bindValue(':nombre', $this->nombre, PDO::PARAM_STR);
         $consulta->bindValue(':precio', $this->precio, PDO::PARAM_STR);
-        $consulta->bindValue(':rol', $this->precio, PDO::PARAM_STR);
+        $consulta->bindValue(':rol', $this->rol, PDO::PARAM_STR);
         $consulta->execute();
 
         return $objAccesoDatos->obtenerUltimoId();
@@ -79,6 +79,14 @@ class Productos
         
         return false;
     }
+    public static function obtenerPrecioPorId($id)
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM Productos where id = :id");
+        $consulta->bindValue(':id', $id , PDO::PARAM_STR);
+        $consulta->execute();
 
+        return $consulta->fetchObject('productos');
+    }
 
 }

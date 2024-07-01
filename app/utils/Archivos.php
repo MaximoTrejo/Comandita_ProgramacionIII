@@ -4,6 +4,7 @@
 class Archivos{
     public static function GuardarArchivoPeticion($directorio, $nuevoNombre, $archivoSubido, $extension)
     {
+
         if (isset($_FILES[$archivoSubido])){
 
             $tmpName = $_FILES[$archivoSubido]["tmp_name"];

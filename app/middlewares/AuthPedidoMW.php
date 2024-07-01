@@ -7,7 +7,7 @@ use Slim\Psr7\Response as Response;
 class AuthPedidoMW{
 
     public function  __invoke(Request $request,RequestHandler $handler){
-        $params = $request ->getQueryParams();
+        $params = $request->getParsedBody();
 
         if(isset($params["ID_F_pedido"])){
 
@@ -16,6 +16,7 @@ class AuthPedidoMW{
             $pedidoEncontrado = Pedidos::obtenerPedido_ID($pedido);
 
             if($pedidoEncontrado!= null){
+                
                 $response = $handler->handle($request);
             }else{
                 $response = new Response();

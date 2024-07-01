@@ -11,12 +11,12 @@ class AuthArticulosMW{
 
         $params = $request ->getParsedBody();
 
-        if(isset($params["ID_pedido"]) && isset($params["ID_articulo"])){
+        if(isset($params["ID_F_pedido"]) && isset($params["ID_articulo"])){
 
             $articulo = $params["ID_articulo"];
-            $pedido = $params["ID_pedido"];
+            $pedido = $params["ID_F_pedido"];
 
-            $pedidoEncontrado = Ped_Productos::obtePedPenID($pedido,$articulo);
+            $pedidoEncontrado = Ped_Productos::obtePedidos($pedido,$articulo);
 
             if($pedidoEncontrado != null){
                 $response = $handler->handle($request);

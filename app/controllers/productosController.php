@@ -70,6 +70,8 @@ class productosController extends Productos implements IApiUsable
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
+
+
     
 
 }

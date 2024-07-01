@@ -9,8 +9,7 @@ class  AuthRolesMW{
 
     public function  __invoke(Request $request,RequestHandler $handler){
 
-        $params = $request ->getParsedBody();
-        $roles = ['bartender', 'cervecero', 'cocinero', 'mozo', 'socio'];
+        $roles = ['bartender', 'cervecero', 'cocinero', 'mozo', 'socio','cliente'];
 
         $response = new Response();
         $header = $request->getHeaderLine('Authorization');
@@ -112,10 +111,10 @@ class AuthMozoMW{
             try {
                 AutentificadorJWT::VerificarToken($token);
                 $dataJWT = AutentificadorJWT::ObtenerData($token);
-                if(!strcasecmp($dataJWT->rol, "mozo")){
+                if(!strcasecmp($dataJWT->rol, "mozo") || !strcasecmp($dataJWT->rol, "socio") ){
                     $response = $handler->handle($request);
                 }else{
-                    $response->getBody()->write(json_encode(array("msg" => "Solo los socios pueden realizar esta accion!")));
+                    $response->getBody()->write(json_encode(array("msg" => "Solo los mozos pueden realizar esta accion!")));
                 }
 
             }catch (Exception $ex) {

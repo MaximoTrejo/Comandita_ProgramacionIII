@@ -2,6 +2,7 @@
 
 //llamado a clase usaurio 
 require_once './models/Mesas.php';
+require_once './models/Pedidos.php';
 
 //llamado a index 
 require_once './interfaces/IApiUsable.php';
@@ -16,7 +17,6 @@ class mesasController extends Mesas implements IApiUsable
         
         // Creamos el usuario
         $usr = new  Mesas();
-        $usr->estado = $parametros['estado'];
         //llamado a funcion 
         $usr->crearMesa();
 
@@ -35,7 +35,6 @@ class mesasController extends Mesas implements IApiUsable
         return $response
           ->withHeader('Content-Type', 'application/json');
     }
-
 
     public function ExportarCsv($request, $response, $args)
     {
@@ -72,5 +71,17 @@ class mesasController extends Mesas implements IApiUsable
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
+
+    public function CerrarMesa($request, $response, $args){
+        $parametros = $request->getParsedBody();
+        $mesa = new Mesas();
+        $mesa ->id = $parametros['idMesa'];
+        $mesa->modificarEstado("CERRADA");
+        $payload = json_encode(array("msg" => "Se cerro la mesa"));
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+
+    }
+
 
 }
