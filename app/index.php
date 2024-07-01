@@ -89,7 +89,7 @@ $app->group('/Pedidos', function (RouteCollectorProxy $group) {
     $group->post('/cuenta', \PedidosController::class . ':pedirCuenta')->add(new AuthPedidoMW())->add(new AuthMozoMW()); 
     //pago(cambiar el estado de la mesa por disponible)
     $group->post('/pagar', \PedidosController::class . ':pagarCuenta')->add(new AuthPedidoMW())->add(new AuthMozoMW()); 
-    $group->post('/cargarFoto', \pedidosController::class . ':CargarFoto');
+    $group->post('/cargarFoto', \pedidosController::class . ':CargarFoto')->add(new AuthPedidoMW());
     $group->post('/Cliente/verPedido', \pedidosController::class . ':verPedidoCliente')->add(new AuthPedidoMW())->add(new AuthMesaDisponible()); 
     $group->post('/Socios/verPedidosFinalizados', \pedidosController::class . ':verPedidosFinalizados')->add(new AuthSocioMW());
 })->add(new AuthRolesMW())

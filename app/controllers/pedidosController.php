@@ -17,7 +17,7 @@ class pedidosController extends Pedidos implements IApiUsable
         //traer datos desde el compose
         $parametros = $request->getParsedBody();
         //Obtengo por parametros el IdArticulo
-        $articulos= $parametros['idArticulo'];
+        $articulos= $parametros['ID_F_pedido'];
         //Transformo lo enviado por parametro a un Json 
         $array = json_decode($articulos, true);
 
@@ -181,7 +181,7 @@ public function TraerPedidosPendientesCerveceros($request, $response, $args)
     public static function CargarFoto( $request, $response,$args)
 	{
 		$params = $request->getParsedBody();
-        $idPedido = $params['ID_pedido'];
+        $idPedido = $params['ID_F_pedido'];
 		$pedido = Pedidos::obtenerPedido_ID($idPedido)[0];
 		$uriFoto = Archivos::GuardarArchivoPeticion("./FotosMesas/", "Mesa{$pedido->idMesa}_{$idPedido}", 'foto', '.jpg');
 		Pedidos::agregarFoto($idPedido, $uriFoto);
