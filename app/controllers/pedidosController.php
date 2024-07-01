@@ -17,7 +17,7 @@ class pedidosController extends Pedidos implements IApiUsable
         //traer datos desde el compose
         $parametros = $request->getParsedBody();
         //Obtengo por parametros el IdArticulo
-        $articulos= $parametros['ID_F_pedido'];
+        $articulos= $parametros['idArticulo'];
         //Transformo lo enviado por parametro a un Json 
         $array = json_decode($articulos, true);
 

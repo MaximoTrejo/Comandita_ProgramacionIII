@@ -96,7 +96,7 @@ class Ped_Productos{
     public static function verificarPedido($pedido)
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM Ped_Productos where id_pedido = :id_pedido and estado not in ('finalizado','PENDIENTE','LISTO')");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM Ped_Productos where id_pedido = :id_pedido and estado not in ('finalizado','LISTO')");
         $consulta->bindValue(':id_pedido', $pedido, PDO::PARAM_STR);
         $consulta->execute();
 
