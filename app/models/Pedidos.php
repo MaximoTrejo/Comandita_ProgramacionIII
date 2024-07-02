@@ -8,16 +8,18 @@ class Pedidos
     public $total;
     public $estado;
     public $foto;
+    public $TiempoEstipulado;
 
     public function crearPedido()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedidos (idUsuario , idMesa,total,estado,foto) VALUES (:idUsuario,:idMesa,:total,:estado,:foto)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedidos (idUsuario , idMesa,total,estado,foto,TiempoEstipulado) VALUES (:idUsuario,:idMesa,:total,:estado,:foto,:tiempo)");
         $consulta->bindValue(':idUsuario', $this->idUsuario, PDO::PARAM_STR);
         $consulta->bindValue(':idMesa', $this->idMesa, PDO::PARAM_STR);
         $consulta->bindValue(':total', $this->total, PDO::PARAM_STR);
         $consulta->bindValue(':estado', "PREPARACION", PDO::PARAM_STR);
         $consulta->bindValue(':foto',"N/A", PDO::PARAM_STR);
+        $consulta->bindValue(':tiempo',"40", PDO::PARAM_STR);
         $consulta->execute();
         return $objAccesoDatos->obtenerUltimoId();
     }
@@ -50,7 +52,7 @@ class Pedidos
         $consulta->bindValue(':id', $pedido, PDO::PARAM_STR);
         $consulta->execute();
 
-        return $consulta->fetchAll(PDO::FETCH_CLASS,'pedidos');
+        return $consulta->fetchAll(PDO::FETCH_CLASS);
     }
 
     public static function agregarFoto($id, $uri)
@@ -80,6 +82,21 @@ class Pedidos
         return $req->fetchAll(PDO::FETCH_CLASS);
     }
 
+    public static function obtenerPedidoTiempoNoEstipulado($id)
+    {
+        $objAccesoDatos = AccesoDatos::ObtenerInstancia();
+        $req = $objAccesoDatos->PrepararConsulta("SELECT pd.id, pd.tiempoEstipulado, SUM(prd.tiempoPedido) AS tiempoTotalPedido FROM ped_productos prd INNER JOIN pedidos pd ON prd.id_pedido = pd.id WHERE prd.estado = 'LISTO' and pd.id = :id GROUP BY pd.id, pd.tiempoEstipulado HAVING SUM(prd.tiempoPedido) >= pd.tiempoEstipulado");
+        $req->bindValue(':id', $id, PDO::PARAM_INT);
+        $req->execute();
+        return $req->fetchAll(PDO::FETCH_CLASS);
+    }
 
+    public static function obtenerTodosPedidoTiempoNoEstipulado()
+    {
+        $objAccesoDatos = AccesoDatos::ObtenerInstancia();
+        $req = $objAccesoDatos->PrepararConsulta("SELECT pd.id, pd.tiempoEstipulado, SUM(prd.tiempoPedido) AS tiempoTotalPedido FROM ped_productos prd INNER JOIN pedidos pd ON prd.id_pedido = pd.id WHERE prd.estado = 'LISTO' GROUP BY pd.id, pd.tiempoEstipulado HAVING SUM(prd.tiempoPedido) >= pd.tiempoEstipulado");
+        $req->execute();
+        return $req->fetchAll(PDO::FETCH_CLASS);
+    }
 
 }

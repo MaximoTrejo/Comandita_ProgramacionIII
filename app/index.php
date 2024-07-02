@@ -56,6 +56,8 @@ $app->group('/usuarios', function (RouteCollectorProxy $group) {
     $group->post('[/]', \UsuarioController::class . ':CargarUno') ->add (new chekRolesMW);
     $group->post('/MesaMasUsada', \pedidosController::class . ':TraerMesaMasUsada');
     $group->post('/MejoresComentarios', \pedidosController::class . ':TraerMejoresComentarios');
+    $group->post('/Socios/PedidoNoEntregadoEnTiempoEstipulado', \pedidosController::class . ':PedidoNoEntregadosTiempo')->add(new AuthPedidoMW());
+    $group->post('/Socios/TodosPedidosNoEntregadoEnTiempoEstipulado', \pedidosController::class . ':TodosPedidosNoEntregadosTiempo');
 })->add(new AuthSocioMW())
 ->add(new AuthRolesMW())
 ->add(new AuthEstadoMW());

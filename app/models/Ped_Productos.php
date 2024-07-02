@@ -11,11 +11,11 @@ class Ped_Productos{
     public function crearProductos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO Ped_Productos (id_pedido,id_articulos,estado,tiempoPedido) VALUES (:id_pedido , :id_articulos,:estado,:tiempo)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO Ped_Productos (id_pedido,id_articulos,estado,tiempoPedido) VALUES (:id_pedido ,:id_articulos,:estado,:tiempo)");
         $consulta->bindValue(':id_pedido', $this->id_pedido, PDO::PARAM_STR);
         $consulta->bindValue(':id_articulos', $this->id_articulos, PDO::PARAM_STR);
         $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
-        $consulta->bindValue(':tiempo', "0", PDO::PARAM_STR);
+        $consulta->bindValue(':tiempoPedido', "0", PDO::PARAM_STR);
         $consulta->execute();
 
         return $objAccesoDatos;

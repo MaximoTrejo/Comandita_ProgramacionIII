@@ -297,5 +297,31 @@ public function TraerPedidosPendientesCerveceros($request, $response, $args)
         $response->getBody()->write($payload);
         return $response ->withHeader('Content-Type', 'application/json');
     }
+    
 
+    //FINAL
+
+    public static function PedidoNoEntregadosTiempo( $request, $response,$args){
+        $params = $request->getParsedBody();
+        $idPedido = $params['ID_F_pedido'];
+        $lista = Pedidos::obtenerPedidoTiempoNoEstipulado($idPedido);
+
+        if($lista != null){
+            $payload = json_encode(array("pedido no entregado en tiempo estipulado " => $lista));
+        }else{
+            $payload = json_encode(array("mensaje" => "el pedido buscado cumple con el tiempo estipulado"));
+        }
+		$response->getBody()->write($payload);
+		return $response->withHeader('Content-Type', 'application/json');
+
+    }
+
+
+    public static function TodosPedidosNoEntregadosTiempo( $request, $response,$args){
+        $lista = Pedidos::obtenerTodosPedidoTiempoNoEstipulado();
+        $payload = json_encode(array("pedidos no entregados en tiempo estipulado " => $lista));
+		$response->getBody()->write($payload);
+		return $response->withHeader('Content-Type', 'application/json');
+
+    }
 }
