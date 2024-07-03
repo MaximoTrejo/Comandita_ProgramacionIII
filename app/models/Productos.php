@@ -89,4 +89,14 @@ class Productos
         return $consulta->fetchObject('productos');
     }
 
+    public static function TraerPorId($id)
+	{
+		$objAccesoDatos = AccesoDatos::ObtenerInstancia();
+		$req = $objAccesoDatos->PrepararConsulta("SELECT * from Productos WHERE id LIKE :id");
+		$req->bindValue(':id', $id, PDO::PARAM_STR);
+		$req->execute();
+
+		return $req->fetchAll(PDO::FETCH_CLASS, 'Productos');
+	}
+
 }

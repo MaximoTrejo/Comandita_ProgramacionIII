@@ -11,7 +11,7 @@ class Ped_Productos{
     public function crearProductos()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO Ped_Productos (id_pedido,id_articulos,estado,tiempoPedido) VALUES (:id_pedido ,:id_articulos,:estado,:tiempo)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO Ped_Productos (id_pedido,id_articulos,estado,tiempoPedido) VALUES (:id_pedido ,:id_articulos,:estado,:tiempoPedido)");
         $consulta->bindValue(':id_pedido', $this->id_pedido, PDO::PARAM_STR);
         $consulta->bindValue(':id_articulos', $this->id_articulos, PDO::PARAM_STR);
         $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
@@ -121,4 +121,15 @@ class Ped_Productos{
         $consulta->execute();
         return $consulta->fetchAll(PDO::FETCH_CLASS);
     }
+
+
+    public static function TraerProdPorPedido($idPedido)
+	{
+		$objAccesoDatos = AccesoDatos::ObtenerInstancia();
+		$req = $objAccesoDatos->PrepararConsulta("SELECT id_articulos from Ped_Productos WHERE id_Pedido=:idPedido");
+		$req->bindValue(':idPedido', $idPedido, PDO::PARAM_STR);
+		$req->execute();
+
+		return $req->fetchAll(PDO::FETCH_COLUMN);
+	}
 }

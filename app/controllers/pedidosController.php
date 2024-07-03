@@ -31,7 +31,6 @@ class pedidosController extends Pedidos implements IApiUsable
         $usr->idUsuario = $parametros['idUsuario'];
         $usr->idMesa = $parametros['idMesa'];
         $usr->total = $precioTotal;
-        
         //llamado a funcion 
         $usr->crearPedido();
 
@@ -324,4 +323,18 @@ public function TraerPedidosPendientesCerveceros($request, $response, $args)
 		return $response->withHeader('Content-Type', 'application/json');
 
     }
+
+
+    public static function PDF($request, $response,$args)
+	{
+        $params = $request->getParsedBody();
+        $numeroRecibo = $params['ID_F_pedido']; 
+        $pedidoBuscado = Pedidos::obtenerPedido_ID($numeroRecibo);
+        $idPedido = $pedidoBuscado[0]->id;
+        $Total = $pedidoBuscado[0]->total;
+        $idUsuario = $pedidoBuscado[0]->idUsuario;
+        $objPdf = Pedidos::CrearPdf($idPedido,$idUsuario,$Total);
+		$nombreArchivo = "recibo_" . $pedidoBuscado[0]->id . ".pdf";
+		$objPdf->Output("D",$nombreArchivo);
+	}
 }

@@ -1,5 +1,9 @@
 <?php
 
+require_once './utils/pdf/fpdf.php';
+require_once './models/Ped_Productos.php';
+require_once './models/Productos.php';
+
 class Pedidos
 {
     public $id;
@@ -13,7 +17,7 @@ class Pedidos
     public function crearPedido()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedidos (idUsuario , idMesa,total,estado,foto,TiempoEstipulado) VALUES (:idUsuario,:idMesa,:total,:estado,:foto,:tiempo)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedidos (idUsuario , idMesa,total,estado,foto,tiempoEstipulado) VALUES (:idUsuario,:idMesa,:total,:estado,:foto,:tiempo)");
         $consulta->bindValue(':idUsuario', $this->idUsuario, PDO::PARAM_STR);
         $consulta->bindValue(':idMesa', $this->idMesa, PDO::PARAM_STR);
         $consulta->bindValue(':total', $this->total, PDO::PARAM_STR);
@@ -98,5 +102,41 @@ class Pedidos
         $req->execute();
         return $req->fetchAll(PDO::FETCH_CLASS);
     }
+
+
+
+    public static function CrearPdf($idPedido , $idUsuario, $total)
+	{
+		$pdf = new FPDF();
+		$pdf->AddPage();
+		$pdf->SetFont('Courier', 'BU', 35);
+		$pdf->Cell(187.5, 30, "PEDIDO", 1, 0, 'C');
+
+		$pdf->Image('./LogoImg/logo.png', 11.25, null, 30, 30, 'png');
+
+		$pdf->SetFont('Arial', '', 16);
+		$pdf->Write(10, "Id del pedido: #{$idPedido}\n");
+		$pdf->Write(10, "Cliente: {$idUsuario}\n");
+
+		$pdf->SetFillColor(255, 239, 219);
+		$pdf->Cell(15, 8, "ID", 1, 0, 'C', 1);
+		$pdf->Cell(142.5, 8, "PRODUCTO", 1, 0, 'C', 1);
+		$pdf->Cell(30, 8, "PRECIO", 1, 1, 'C', 1);
+
+		$idProductos = Ped_Productos::TraerProdPorPedido($idPedido);
+
+		foreach ($idProductos as $prodId) {
+			$producto = Productos::TraerPorId($prodId)[0];
+			$pdf->Cell(15, 8, "$producto->id", 1, 0, 'L', 1);
+			$pdf->Cell(142.5, 8, "$producto->nombre", 1, 0, 'L', 1);
+			$pdf->Cell(30, 8, "\$$producto->precio", 1, 1, 'R', 1);
+		}
+
+		$pdf->SetFont('Arial', 'B', 16);
+		$pdf->Cell(157.5, 10, "TOTAL", 1, 0, 'L');
+		$pdf->Cell(30, 10, "\${$total}", 1, 1, 'R');
+
+		return $pdf;
+	}
 
 }

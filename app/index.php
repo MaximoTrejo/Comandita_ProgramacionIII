@@ -94,6 +94,7 @@ $app->group('/Pedidos', function (RouteCollectorProxy $group) {
     $group->post('/cargarFoto', \pedidosController::class . ':CargarFoto')->add(new AuthPedidoMW());
     $group->post('/Cliente/verPedido', \pedidosController::class . ':verPedidoCliente')->add(new AuthPedidoMW())->add(new AuthMesaDisponible()); 
     $group->post('/Socios/verPedidosFinalizados', \pedidosController::class . ':verPedidosFinalizados')->add(new AuthSocioMW());
+    $group->post('/DescargarPDF', \pedidosController::class . ':PDF')->add(new AuthPedidoMW());
 })->add(new AuthRolesMW())
 ->add(new AuthEstadoMW());
 
