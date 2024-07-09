@@ -35,7 +35,7 @@ $dotenv->safeLoad();
 // Instantiate App
 $app = AppFactory::create();
 
-// Add error middleware
+// Add error middleware Tobi estuvo aquí
 $app->addErrorMiddleware(true, true, true);
 
 // Add parse body

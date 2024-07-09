@@ -85,6 +85,7 @@ class Usuario
     public static function SubirDatosCsv()
     {
         $ruta = BASE_PATH . '/ArchivosSubidos/';
+        
         $archivo = Archivos::GuardarArchivoPeticion($ruta, "UsuariosSubidos", 'archivo', '.csv');
         
         if ($archivo != "N/A") {

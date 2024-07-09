@@ -17,13 +17,14 @@ class Pedidos
     public function crearPedido()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedidos (idUsuario , idMesa,total,estado,foto,tiempoEstipulado) VALUES (:idUsuario,:idMesa,:total,:estado,:foto,:tiempo)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedidos (id,idUsuario , idMesa,total,estado,foto,tiempoEstipulado) VALUES (:id,:idUsuario,:idMesa,:total,:estado,:foto,:tiempo)");
+        $consulta->bindValue(':id', $this->id, PDO::PARAM_STR);
         $consulta->bindValue(':idUsuario', $this->idUsuario, PDO::PARAM_STR);
         $consulta->bindValue(':idMesa', $this->idMesa, PDO::PARAM_STR);
         $consulta->bindValue(':total', $this->total, PDO::PARAM_STR);
         $consulta->bindValue(':estado', "PREPARACION", PDO::PARAM_STR);
-        $consulta->bindValue(':foto',"N/A", PDO::PARAM_STR);
-        $consulta->bindValue(':tiempo',"40", PDO::PARAM_STR);
+        $consulta->bindValue(':foto', "N/A", PDO::PARAM_STR);
+        $consulta->bindValue(':tiempo', "40", PDO::PARAM_STR);
         $consulta->execute();
         return $objAccesoDatos->obtenerUltimoId();
     }
@@ -34,7 +35,7 @@ class Pedidos
         $consulta = $objAccesoDatos->prepararConsulta("SELECT id,idUsuario,idMesa,total,estado,foto FROM pedidos");
         $consulta->execute();
 
-        return $consulta->fetchAll(PDO::FETCH_CLASS,'pedidos');
+        return $consulta->fetchAll(PDO::FETCH_CLASS, 'pedidos');
     }
 
 
@@ -60,23 +61,23 @@ class Pedidos
     }
 
     public static function agregarFoto($id, $uri)
-	{
-		$objAccesoDatos = AccesoDatos::ObtenerInstancia();
-		$req = $objAccesoDatos->PrepararConsulta("UPDATE pedidos SET foto=:localizacion WHERE id=:id");
-		$req->bindValue(':id', $id, PDO::PARAM_INT);
-		$req->bindValue(':localizacion', $uri, PDO::PARAM_STR);
-		$req->execute();
+    {
+        $objAccesoDatos = AccesoDatos::ObtenerInstancia();
+        $req = $objAccesoDatos->PrepararConsulta("UPDATE pedidos SET foto=:localizacion WHERE id=:id");
+        $req->bindValue(':id', $id, PDO::PARAM_INT);
+        $req->bindValue(':localizacion', $uri, PDO::PARAM_STR);
+        $req->execute();
 
-		return $objAccesoDatos->ObtenerUltimoId();
-	}
+        return $objAccesoDatos->ObtenerUltimoId();
+    }
     public static function obtenerMesaMasUsada()
-	{
-		$objAccesoDatos = AccesoDatos::obtenerInstancia();
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT idMesa, COUNT(idMesa) as cantidadDeVecesQueSeUsoLaMesa FROM pedidos GROUP BY idMesa ORDER BY cantidadDeVecesQueSeUsoLaMesa DESC LIMIT 1;");
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS);
-	}
+    }
 
     public static function traerMejComentarios()
     {
@@ -105,38 +106,72 @@ class Pedidos
 
 
 
-    public static function CrearPdf($idPedido , $idUsuario, $total)
-	{
-		$pdf = new FPDF();
-		$pdf->AddPage();
-		$pdf->SetFont('Courier', 'BU', 35);
-		$pdf->Cell(187.5, 30, "PEDIDO", 1, 0, 'C');
+    public static function CrearPdf($idPedido, $idUsuario, $total)
+    {
+        $pdf = new FPDF();
+        $pdf->AddPage();
+        $pdf->SetFont('Courier', 'BU', 35);
+        $pdf->Cell(187.5, 30, "PEDIDO", 1, 0, 'C');
 
-		$pdf->Image('./LogoImg/logo.png', 11.25, null, 30, 30, 'png');
+        $pdf->Image('./LogoImg/logo.png', 11.25, null, 30, 30, 'png');
 
-		$pdf->SetFont('Arial', '', 16);
-		$pdf->Write(10, "Id del pedido: #{$idPedido}\n");
-		$pdf->Write(10, "Cliente: {$idUsuario}\n");
+        $pdf->SetFont('Arial', '', 16);
+        $pdf->Write(10, "Id del pedido: #{$idPedido}\n");
+        $pdf->Write(10, "Cliente: {$idUsuario}\n");
 
-		$pdf->SetFillColor(255, 239, 219);
-		$pdf->Cell(15, 8, "ID", 1, 0, 'C', 1);
-		$pdf->Cell(142.5, 8, "PRODUCTO", 1, 0, 'C', 1);
-		$pdf->Cell(30, 8, "PRECIO", 1, 1, 'C', 1);
+        $pdf->SetFillColor(255, 239, 219);
+        $pdf->Cell(15, 8, "ID", 1, 0, 'C', 1);
+        $pdf->Cell(142.5, 8, "PRODUCTO", 1, 0, 'C', 1);
+        $pdf->Cell(30, 8, "PRECIO", 1, 1, 'C', 1);
 
-		$idProductos = Ped_Productos::TraerProdPorPedido($idPedido);
+        $idProductos = Ped_Productos::TraerProdPorPedido($idPedido);
 
-		foreach ($idProductos as $prodId) {
-			$producto = Productos::TraerPorId($prodId)[0];
-			$pdf->Cell(15, 8, "$producto->id", 1, 0, 'L', 1);
-			$pdf->Cell(142.5, 8, "$producto->nombre", 1, 0, 'L', 1);
-			$pdf->Cell(30, 8, "\$$producto->precio", 1, 1, 'R', 1);
-		}
+        foreach ($idProductos as $prodId) {
+            $producto = Productos::TraerPorId($prodId)[0];
+            $pdf->Cell(15, 8, "$producto->id", 1, 0, 'L', 1);
+            $pdf->Cell(142.5, 8, "$producto->nombre", 1, 0, 'L', 1);
+            $pdf->Cell(30, 8, "\$$producto->precio", 1, 1, 'R', 1);
+        }
 
-		$pdf->SetFont('Arial', 'B', 16);
-		$pdf->Cell(157.5, 10, "TOTAL", 1, 0, 'L');
-		$pdf->Cell(30, 10, "\${$total}", 1, 1, 'R');
+        $pdf->SetFont('Arial', 'B', 16);
+        $pdf->Cell(157.5, 10, "TOTAL", 1, 0, 'L');
+        $pdf->Cell(30, 10, "\${$total}", 1, 1, 'R');
 
-		return $pdf;
-	}
+        return $pdf;
+    }
 
+    public static function IdAlfanumerico()
+    {
+
+        $listaIDs = self::obtenerListaIDs();
+        $existingIDs = array_map(function ($item) {
+            return $item->id;
+        }, $listaIDs);
+
+        function generarID()
+        {
+            $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $longitud = 5;
+            $id = '';
+            for ($i = 0; $i < $longitud; $i++) {
+                $id .= $caracteres[rand(0, strlen($caracteres) - 1)];
+            }
+            return $id;
+        }
+
+
+        do {
+            $nuevoID = generarID();
+        } while (in_array($nuevoID, $existingIDs));
+
+        return $nuevoID;
+    }
+
+    public static function obtenerListaIDs()
+    {
+        $objAccesoDatos = AccesoDatos::ObtenerInstancia();
+        $req = $objAccesoDatos->PrepararConsulta("SELECT id as id  from pedidos");
+        $req->execute();
+        return $req->fetchAll(PDO::FETCH_CLASS);
+    }
 }

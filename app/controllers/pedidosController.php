@@ -22,35 +22,32 @@ class pedidosController extends Pedidos implements IApiUsable
         $array = json_decode($articulos, true);
 
         $precioTotal = 0;
+
         foreach($array as $producto){
             $precioProducto = Productos::obtenerPrecioPorId($producto);
             $precioTotal += $precioProducto->precio;
         }
-        // Creamos el usuario
+
         $usr = new Pedidos();
+        $usr->id = self::IdAlfanumerico();
         $usr->idUsuario = $parametros['idUsuario'];
         $usr->idMesa = $parametros['idMesa'];
         $usr->total = $precioTotal;
         //llamado a funcion 
         $usr->crearPedido();
 
-        //traigo el objeto acceso de datos
-        $ObjetoAccD = AccesoDatos::obtenerInstancia() ;
-        //obtengo el ultimo id utilizando la funcion que esta dentro de mi onjeto AccesoDatos
-        $ultimoID = $ObjetoAccD  ->obtenerUltimoId();
-        //verifico que sea un array
         if (is_array($array)) {
             //recorro el array y voy cargando los productos a mi tabla Ped_productos
             foreach ( $array as $art){
                 $ped = new Ped_Productos();
-                $ped->id_pedido = $ultimoID;
+                $ped->id_pedido = $usr->id;
                 $ped->id_articulos =$art;
                 $ped->estado = 'PENDIENTE';
                 $ped->crearProductos();
             }
         }
         //revisar
-        $payload = json_encode(array("mensaje" => "Pedido creado con exito"));
+        $payload = json_encode(array("mensaje" => "Pedido creado con exito " .$usr->id ));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
